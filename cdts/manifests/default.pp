@@ -41,6 +41,11 @@ class cdts {
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
     command => "/usr/bin/add-apt-repository --yes ppa:checkbox-dev/ppa"
   }
+  exec { 'Enable PPA canonical-hwe-team/piglit':
+    require => Package['python-software-properties'],
+    before  => Exec['apt-get update', 'apt-get dist-upgrade'],
+    command => "/usr/bin/add-apt-repository --yes ppa:canonical-hwe-team/piglit"
+  }
   exec { 'Enable PPA checkbox-ihv-ng/private-ppa':
     require => Package['python-software-properties'],
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
