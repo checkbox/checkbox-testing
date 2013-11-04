@@ -46,6 +46,11 @@ class cdts {
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
     command => "/usr/bin/add-apt-repository --yes ppa:canonical-hwe-team/piglit"
   }
+  exec { 'Add auth key for PPA checkbox-ihv-ng/private-ppa':
+    before  => Package['canonical-driver-test-suite'],
+    command => "/usr/bin/apt-key --keyserver keyserver.ubuntu.com --recv-keys EBBDFC1E",
+    onlyif  => "/usr/bin/apt-key list | ! /bin/grep --quiet EBBDFC1E"
+  }
   exec { 'Enable PPA checkbox-ihv-ng/private-ppa':
     require => Package['python-software-properties'],
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
