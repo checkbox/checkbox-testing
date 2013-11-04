@@ -55,6 +55,7 @@ class cdts {
     require => [
       Exec['Enable PPA checkbox-ihv-ng/private-ppa'],
       Exec['Enable PPA ubuntu-sdk-team/ppa'],
+      Exec['Enable PPA canonical-hwe-team/piglit'],
       Exec['Enable PPA canonical-qt5-edgers/qt5-proper'],
       Exec['apt-get update']
     ],
