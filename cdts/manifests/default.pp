@@ -56,6 +56,13 @@ class cdts {
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
     command => "/usr/bin/add-apt-repository --yes 'deb https://${ppa_secret}@private-ppa.launchpad.net/checkbox-ihv-ng/private-ppa/ubuntu precise main'"
   }
+  package { "plainbox-insecure-policy":
+    require => [
+      Exec['Enable PPA checkbox-dev/ppa'],
+      Exec['apt-get update']
+    ],
+    ensure => installed
+  }
   package { "canonical-driver-test-suite":
     require => [
       Exec['Enable PPA canonical-qt5-edgers/qt5-proper'],
