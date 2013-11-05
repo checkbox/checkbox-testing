@@ -72,12 +72,14 @@ class ubuntu_sdk {
   exec { "Enable PPA canonical-qt5-edgers/qt5-proper":
     require => Package['python-software-properties'],
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
-    command => "/usr/bin/add-apt-repository --yes ppa:canonical-qt5-edgers/qt5-proper"
+    command => "/usr/bin/add-apt-repository --yes ppa:canonical-qt5-edgers/qt5-proper",
+    onlyif  => "/usr/bin/test ! -e /etc/apt/sources.list.d/canonical-qt5-edgers-qt5-proper-precise.list",
   }
   exec { "Enable PPA ubuntu-sdk-team/ppa":
     require => Package['python-software-properties'],
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
-    command => "/usr/bin/add-apt-repository --yes ppa:ubuntu-sdk-team/ppa"
+    command => "/usr/bin/add-apt-repository --yes ppa:ubuntu-sdk-team/ppa",
+    onlyif  => "/usr/bin/test ! -e /etc/apt/sources.list.d/ubuntu-sdk-team-ppa-precise.list",
   }
 }
 
@@ -90,12 +92,14 @@ class cdts {
   exec { 'Enable PPA checkbox-dev/ppa':
     require => Package['python-software-properties'],
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
-    command => "/usr/bin/add-apt-repository --yes ppa:checkbox-dev/ppa"
+    command => "/usr/bin/add-apt-repository --yes ppa:checkbox-dev/ppa",
+    onlyif  => "/usr/bin/test ! -e /etc/apt/sources.list.d/checkbox-dev-ppa-precise.list",
   }
   exec { 'Enable PPA canonical-hwe-team/piglit':
     require => Package['python-software-properties'],
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
-    command => "/usr/bin/add-apt-repository --yes ppa:canonical-hwe-team/piglit"
+    command => "/usr/bin/add-apt-repository --yes ppa:canonical-hwe-team/piglit",
+    onlyif  => "/usr/bin/test ! -e /etc/apt/sources.list.d/canonical-hwe-team-piglit-precise.list",
   }
   exec { 'Add auth key for PPA checkbox-ihv-ng/private-ppa':
     path    => "/usr/lib/lightdm/lightdm:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games",
@@ -103,9 +107,11 @@ class cdts {
     onlyif  => "sh -c '! apt-key list | grep --quiet EBBDFC1E'"
   }
   exec { 'Enable PPA checkbox-ihv-ng/private-ppa':
+    path    => "/usr/lib/lightdm/lightdm:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games",
     require => Package['python-software-properties'],
     before  => Exec['apt-get update', 'apt-get dist-upgrade'],
-    command => "/usr/bin/add-apt-repository --yes 'deb https://${ppa_secret}@private-ppa.launchpad.net/checkbox-ihv-ng/private-ppa/ubuntu precise main'"
+    command => "add-apt-repository --yes 'deb https://${ppa_secret}@private-ppa.launchpad.net/checkbox-ihv-ng/private-ppa/ubuntu precise main'",
+    onlyif  => "sh -c '! grep -F private-ppa.launchpad.net/checkbox-ihv-ng/private-ppa/ubuntu /etc/apt/sources.list'"
   }
   package { "plainbox-insecure-policy":
     require => [
