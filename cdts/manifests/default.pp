@@ -17,6 +17,57 @@ class base {
   }
 }
 
+class theme {
+  file { 'background':
+    path    => "/usr/share/backgrounds/UnderConstruction.png",
+    ensure  => present,
+    source  => "/vagrant/files/UnderConstruction.png"
+  }
+  exec { 'set custom background (Gnome 2)':
+    require => [
+      File['background'],
+    ],
+    command => "/bin/sh -c 'DISPLAY=:0 gconftool-2 --type=string --set /desktop/gnome/background/picture_filename /usr/share/backgrounds/UnderConstruction.png'",
+    onlyif  => "/usr/bin/test -e /usr/bin/gconftool-2",
+    user    => 'vagrant',
+  }
+  exec { 'set custom background (Gnome 3)':
+    require => [
+      File['background'],
+    ],
+    command => "/bin/sh -c 'DISPLAY=:0 gsettings set org.gnome.desktop.background picture-uri file:///usr/share/backgrounds/UnderConstruction.png'",
+    onlyif  => "/usr/bin/test -e /usr/bin/gsettings",
+    user    => 'vagrant',
+  }
+  # This is just a way to work around the damn quoting/unquoting mess that inline shell causes
+  file { 'customize-unity-launcher.sh':
+    path    => "/usr/local/bin/customize-unity-launcher.sh",
+    mode    => 0755,
+    ensure  => present,
+    content => "dconf write /desktop/unity/launcher/favorites \"['canonical-driver-test-suite.desktop']\"",
+  }
+  file { 'customize-unity-launcher-check.sh':
+    path    => "/usr/local/bin/customize-unity-launcher-check.sh",
+    mode    => 0755,
+    ensure  => present,
+    content => "test \"$(dconf read /desktop/unity/launcher/favorites)\" != \"['canonical-driver-test-suite.desktop']\"",
+  }
+  exec { 'customize unity launcher':
+    require => [
+      Package['canonical-driver-test-suite'],
+      File['customize-unity-launcher.sh']
+    ],
+    command => "/bin/sh -c 'DISPLAY=:0 /usr/local/bin/customize-unity-launcher.sh'",
+    onlyif  => "/bin/sh -c 'DISPLAY=:0 /usr/local/bin/customize-unity-launcher-check.sh'",
+    user    => 'vagrant',
+  }
+  exec { 'restart unity launcher':
+    require => Exec['customize unity launcher'],
+    command => '/usr/bin/killall unity-2d-shell',
+    user    => 'vagrant'
+  }
+}
+
 class ubuntu_sdk {
   exec { "Enable PPA canonical-qt5-edgers/qt5-proper":
     require => Package['python-software-properties'],
@@ -80,3 +131,4 @@ class cdts {
 include base
 include ubuntu_sdk
 include cdts 
+include theme
