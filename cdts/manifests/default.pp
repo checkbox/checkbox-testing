@@ -65,6 +65,7 @@ class cdts {
   }
   package { "canonical-driver-test-suite":
     require => [
+      Exec['Enable PPA checkbox-dev/ppa'],
       Exec['Enable PPA canonical-qt5-edgers/qt5-proper'],
       Exec['Enable PPA ubuntu-sdk-team/ppa'],
       Exec['Enable PPA canonical-hwe-team/piglit'],
