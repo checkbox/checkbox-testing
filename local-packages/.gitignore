@@ -1,0 +1,9 @@
+*.changes
+*.deb
+*.dsc
+*.tar.gz
+Packages
+checkbox
+checkbox-ihv-ng
+checkbox-ihv-ng-packaging
+checkbox-packaging

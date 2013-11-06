@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby sw=2 ts=2 :
+
+Vagrant::Config.run do |config|
+
+  config.ssh.timeout = 60
+
+  config.vm.define :precise_desktop do |precise_desktop_config|
+    precise_desktop_config.vm.box = "precise-desktop-i386"
+    precise_desktop_config.vm.boot_mode = :gui
+  end
+
+  # Setup an apt cache if one is available
+  if ENV.key? "VAGRANT_APT_CACHE"
+    config.vm.provision :shell, :inline => "echo 'Acquire::http { Proxy \"#{ENV['VAGRANT_APT_CACHE']}\"; };' > /etc/apt/apt.conf"
+  end
+
+  config.vm.provision :shell, :inline => "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get dist-upgrade --yes"
+  config.vm.provision :shell, :inline => "apt-get install --yes python-software-properties dpkg-dev"
+  config.vm.provision :shell, :inline => "add-apt-repository ppa:checkbox-dev/ppa"
+  config.vm.provision :shell, :inline => "cd /vagrant && dpkg-scanpackages . /dev/null > /vagrant/Packages"
+  config.vm.provision :shell, :inline => "add-apt-repository 'deb file:/vagrant ./'"
+  config.vm.provision :shell, :inline => "echo 'Package: *' >/etc/apt/preferences.d/00vagrant"
+  config.vm.provision :shell, :inline => "echo 'Pin: origin ppa.launchpad.net' >> /etc/apt/preferences.d/00vagrant"
+  config.vm.provision :shell, :inline => "echo 'Pin-Priority: 100' >> /etc/apt/preferences.d/00vagrant"
+  # Update apt cache again
+  config.vm.provision :shell, :inline => "apt-get update || :"
+end
